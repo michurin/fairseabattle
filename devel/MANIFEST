@@ -1,0 +1,13 @@
+MANIFEST
+composition/composition.pro
+composition/composition.cpp
+composition/composition.h
+gui/gui.pro
+gui/gui.cpp
+gui/gui.h
+logic/logic.cpp
+logic/logic-demo-build.sh
+logic/logic.pro
+img/auto.xcf
+img/go.xcf
+tests-and-demos.pro
