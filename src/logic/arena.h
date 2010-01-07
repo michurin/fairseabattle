@@ -61,6 +61,7 @@ public:
     BSArenaPuzzle(int sz, int const * const l);
     BSPoint find_fire();
     BSRect apply_result(BSPoint const & fr, BSArena::result const result);
+    void clean();
 };
 
 class BSArenaKey : public BSArena {

@@ -273,8 +273,13 @@ BSArenaPuzzle::apply_result(BSPoint const & fire, BSArena::result const result) 
     return BSRect();
 }
 
-// -----------------------------------------------
+void
+BSArenaPuzzle::clean() {
+    BSArena::clean();
+    already_finded = 0;
+}
 
+// -----------------------------------------------
 
 BSArenaKey::BSArenaKey(int sz, int const * const l) : BSArena(sz, l) {}
 
