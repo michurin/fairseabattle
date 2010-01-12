@@ -1,6 +1,7 @@
 # Variables
 TEMPLATE = app
-#QT += core gui
+QT -= core
+QT -= gui
 #CONFIG += release warn_on qt debug
 OBJECTS_DIR = ../../build
 MOC_DIR = ../../build

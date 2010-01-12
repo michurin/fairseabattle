@@ -22,6 +22,7 @@
 #include "arena.h"
 //#include "map_io.h"
 #include <assert.h>
+#include <stdlib.h> // Linux
 
 //--------------------------------------
 

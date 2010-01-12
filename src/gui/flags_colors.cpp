@@ -29,7 +29,7 @@ const QColor ColorStrategy::flag_to_color_map[] = {
     QColor( 51,102,153), // 4 сюда можно не стрелять
     QColor(255, 60, 20), // 5 (не используется?)
     QColor( 76,179,250), // 6 мимо
-    QColor(204,204,  0)  // 7 потоплен
+    QColor(102, 51, 51)  // 7 потоплен
 };
 
 ColorStrategy::ColorStrategy() :

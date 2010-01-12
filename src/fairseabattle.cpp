@@ -29,7 +29,6 @@
 #include "alerter.h"
 #include "arenawidget.h"
 #include "controller.h"
-//#include "battleframe.h"
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
@@ -87,9 +86,6 @@ int main(int argc, char **argv)
     layout->addWidget(right_arena);
     central_widget->setLayout(layout);
     main_window.setCentralWidget(central_widget);
-
-//    BattleFrame *battle = new BattleFrame();
-//    main_window.setCentralWidget(battle);
 
     // созадём меню
     BooleanMediator *med;
@@ -180,6 +176,7 @@ int main(int argc, char **argv)
     ag->addAction(a);
     m->addAction(a);
 
+#ifdef FAIRSEABATTLEPRERELEASE
     a = new QAction(QObject::tr("Debug-1 (10+10+8)"), &main_window);
     a->setShortcut(Qt::CTRL+Qt::Key_6);
     a->setCheckable(true);
@@ -190,6 +187,7 @@ int main(int argc, char **argv)
     a->setCheckable(true);
     ag->addAction(a);
     m->addAction(a);
+#endif
 
     m->addSeparator();
 
@@ -246,9 +244,6 @@ int main(int argc, char **argv)
     QObject::connect(a, SIGNAL(triggered()), alert, SLOT(about_qt()));
     m->addAction(a);
 
-    // связываем меню
-
-    // связки
     QObject::connect(ctrl, SIGNAL(do_quit()), &app, SLOT(quit()));
 
     // emit new_game

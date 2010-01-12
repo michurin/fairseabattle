@@ -69,7 +69,9 @@ Alerter::about() const {
         tr("About"),
         tr("<h3>FairSeaBattle "
               STR(FAIRSEABATTLEVERSION)
+#ifdef FAIRSEABATTLEPRERELEASE
               STR(FAIRSEABATTLEPRERELEASE)
+#endif
            "</h3>"
            "<p>Copyright (c) 2010 Alexey Michurin</p>"
            "<p>Released under the terms of the"

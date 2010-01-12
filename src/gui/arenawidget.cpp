@@ -36,7 +36,7 @@ ArenaCellWidget::ArenaCellWidget(QWidget * parent, Qt::WindowFlags flags) :
     timer_id(0)
 {
     setFrameStyle(QFrame::Panel | QFrame::Raised);
-    setLineWidth(1);
+    setLineWidth(2);
     setAutoFillBackground(true);
     set_color(target_color);
 }
@@ -176,7 +176,7 @@ ArenaWidget::ArenaWidget(QWidget * parent, Qt::WindowFlags flags) :
     setFrameStyle(QFrame::Box | QFrame::Plain);
     setLineWidth(4);
 
-    setFixedSize(132, 132);
+    setFixedSize(152, 152);
 
     QPalette p(palette());
     p.setColor(QPalette::WindowText, QColor(140, 140, 140));
