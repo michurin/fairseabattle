@@ -1,6 +1,9 @@
 # Variables
+
 VERSION = '1.0'
-PRERELEASE = '3'
+PRERELEASE = '4'
+COMPILE_DEBUG_IO = 'NO' # 'YES'
+
 TEMPLATE = app
 # -Wextra -Weffc++
 QMAKE_CXXFLAGS = -Wall
@@ -45,12 +48,8 @@ SOURCES += src/fairseabattle.cpp \
            src/logic/flags.cpp \
            src/logic/legend.cpp
 
-#
-# For developers only
-#
-developers_io = 'NO' # 'YES'
-contains(developers_io, YES) {
-message("Configuring developers_io...")
+contains(COMPILE_DEBUG_IO, YES) {
+message("Configuring COMPILE_DEBUG_IO...")
 HEADERS += src/logic/map_io.h \
            src/logic/legend_io.h \
            src/logic/flags_io.h \

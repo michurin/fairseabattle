@@ -237,6 +237,14 @@ Controller::right_click(BSPoint p) {
         case BSArena::r_game_over:
             // теперь никто никуда не стреляет
             game_state = gs_view;
+            // arena_h_key or arena_h_puz?
+            for (BSRect::iter i(arena_h_key.get_rect()); i(); ++i) {
+                 BSFlags f(arena_h_key[*i]);
+                 if (f.occupied() && f.fired()) {
+                     emit do_left_change_color(*i,
+                     ColorStrategy(f, update_mode_blink));
+                 }
+            }
             emit do_view_mode();
             break;
         default:

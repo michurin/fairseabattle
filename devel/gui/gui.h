@@ -47,7 +47,7 @@ public:
                          aw,   SLOT(activate()));
         QObject::connect(this, SIGNAL(deactivate_one()),
                          aw,   SLOT(deactivate()));
-			 
+
     }
 public slots:
     void act1() {
@@ -75,13 +75,13 @@ public slots:
             if (x%3 == 0) f.occupy();
             ++x;
             if (x%3 == 0) f.mark();
-	    emit changeColor(
-	        p,
-		ColorStrategy(
-		    f,
-		    p.y()%2 == 0 ? update_mode_blink : update_mode_smooth
-		)
-	    );
+            emit changeColor(
+                p,
+                ColorStrategy(
+                    f,
+                    p.y()%2 == 0 ? update_mode_blink : update_mode_smooth
+                )
+            );
         }
     }
 signals:
