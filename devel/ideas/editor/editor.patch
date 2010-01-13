@@ -1,0 +1,961 @@
+Index: fairseabattle.pro
+===================================================================
+--- fairseabattle.pro	(revision 4)
++++ fairseabattle.pro	(working copy)
+@@ -32,7 +32,9 @@
+            src/logic/map.h \
+            src/logic/arena.h \
+            src/logic/flags.h \
+-           src/logic/legend.h
++           src/logic/legend.h \
++           src/editor/arenawidget_hacked.h \
++           src/editor/editor.h \
+ 
+ SOURCES += src/fairseabattle.cpp \
+            src/gui/alerter.cpp \
+@@ -43,7 +45,9 @@
+            src/logic/geometry.cpp \
+            src/logic/map.cpp \
+            src/logic/flags.cpp \
+-           src/logic/legend.cpp
++           src/logic/legend.cpp \
++           src/editor/arenawidget_hacked.cpp \
++           src/editor/editor.cpp \
+ 
+ #
+ # For developers only
+Index: src/control/controller.cpp
+===================================================================
+--- src/control/controller.cpp	(revision 4)
++++ src/control/controller.cpp	(working copy)
+@@ -21,8 +21,10 @@
+  */
+ #include "controller.h"
+ #include "flags_colors.h"
++#include "../editor/editor.h"
+ //#include <iostream>
+ #include <assert.h>
++#include <QApplication>
+ 
+ // ==============================================
+ 
+@@ -157,6 +159,15 @@
+     }
+ }
+ 
++void 
++Controller::launch_editor() {
++    Editor editor(qApp->activeWindow());
++    if (editor.exec() == QDialog::Accepted) {
++        // TODO : store it
++    }
++}
++
++
+ void
+ Controller::check_and_start_game() {
+     assert(game_state == gs_edit);
+Index: src/control/controller.h
+===================================================================
+--- src/control/controller.h	(revision 4)
++++ src/control/controller.h	(working copy)
+@@ -94,6 +94,7 @@
+     void quit();
+     void new_game();
+     void autosetup_game();
++    void launch_editor();
+     void check_and_start_game();
+     void set_rules(QAction *);
+     void set_first_actor(QAction *);
+Index: src/editor/arenawidget_hacked.h
+===================================================================
+--- src/editor/arenawidget_hacked.h	(revision 0)
++++ src/editor/arenawidget_hacked.h	(revision 0)
+@@ -0,0 +1,132 @@
++/*
++ * Copyright 2010 Alexey Michurin
++ *
++ * This file is part of FairSeaBattle.
++ *
++ * FairSeaBattle is free software: you can redistribute
++ * it and/or modify it under the terms of the
++ * GNU General Public License as published by
++ * the Free Software Foundation, either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * FairSeaBattle is distributed in the hope that
++ * it will be useful, but WITHOUT ANY WARRANTY;
++ * without even the implied warranty of MERCHANTABILITY
++ * or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the
++ * GNU General Public License along with FairSeaBattle.
++ * If not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef BS_GUI_ARENAWIDGET_H
++#define BS_GUI_ARENAWIDGET_H
++
++#include <QFrame>
++#include <QTimerEvent>
++#include <QLinkedList>
++
++#include "map.h"
++#include "flags_colors.h"
++
++namespace Hacked {
++
++class ArenaCellWidget : public QFrame {
++
++    Q_OBJECT
++
++private:
++    int tik_count;
++    QColor target_color;
++    QColor source_color;
++    ColorStrategyMode color_update_mode;
++    int timer_id;
++
++    void update_color();
++//    void set_color(QColor const &);
++    void set_mix_color(QColor const &, QColor const &);
++    void one_step();
++
++protected:
++    void mousePressEvent(QMouseEvent * event);
++    void enterEvent(QEvent *);
++    void leaveEvent(QEvent *);
++    void timerEvent(QTimerEvent * event);
++
++public:
++    ArenaCellWidget(QWidget * parent = 0, Qt::WindowFlags f = 0);
++
++//    ArenaCellWidget(const ArenaCellWidget &);
++//    ArenaCellWidget & operator=(const ArenaCellWidget &);
++
++    void changeColor(ColorStrategy const & color);
++    void set_color(QColor const &);
++
++signals:
++    void click(); // signal say "i'am clicked"
++    void focusEntered();
++    void focusLeft();
++};
++
++// ========================================================
++
++class ArenaCellMediator : public QObject {
++
++    Q_OBJECT
++
++private:
++    BSPoint location;
++
++public:
++    ArenaCellMediator(); // not inmplemented
++    ArenaCellMediator(QObject * qo, const BSPoint & p);
++
++public slots:
++    void click();
++    void focusEntered();
++    void focusLeft();
++
++signals:
++    void click(BSPoint); // signal say "someone click"
++    void focusEntered(BSPoint);
++    void focusLeft(BSPoint);
++};
++
++// ========================================================
++
++class ArenaWidget : public QFrame {
++
++    Q_OBJECT
++
++private:
++    bool is_active;
++    int timer_id;
++
++    void one_step();
++
++protected:
++    BSMap<ArenaCellWidget *> fmap;
++    void timerEvent(QTimerEvent * event);
++
++public:
++    ArenaWidget(QWidget * parent = 0, Qt::WindowFlags f = 0);
++
++public slots:
++    void accept_click(BSPoint);
++    void accept_enter(BSPoint);
++    void accept_leave(BSPoint);
++
++    void change_color(BSPoint p, ColorStrategy c);
++    void clear();
++    void activate();
++    void deactivate();
++
++signals:
++    void click(BSPoint); // signal say "someone click"
++    void enter(BSPoint); // signal say "someone is entered"
++    void leave(BSPoint); // signal say "someone is left"
++};
++
++} // namespace Hacked
++
++#endif
+Index: src/editor/editor.cpp
+===================================================================
+--- src/editor/editor.cpp	(revision 0)
++++ src/editor/editor.cpp	(revision 0)
+@@ -0,0 +1,343 @@
++/*
++ * Copyright 2010 Mikhail Murzin
++ *
++ * This file is part of FairSeaBattle.
++ *
++ * FairSeaBattle is free software: you can redistribute
++ * it and/or modify it under the terms of the
++ * GNU General Public License as published by
++ * the Free Software Foundation, either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * FairSeaBattle is distributed in the hope that
++ * it will be useful, but WITHOUT ANY WARRANTY;
++ * without even the implied warranty of MERCHANTABILITY
++ * or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the
++ * GNU General Public License along with FairSeaBattle.
++ * If not, see <http://www.gnu.org/licenses/>.
++ */
++ 
++#include "editor.h"
++#include "arenawidget_hacked.h"
++#include <QApplication>
++
++#include <QVBoxLayout>
++#include <QHBoxLayout>
++#include <QPushButton>
++#include <QButtonGroup>
++#include <QKeyEvent>
++#include <QList>
++
++static const int Size = 10;
++
++class ConstructorField : public QFrame
++{
++Q_OBJECT
++public:
++	ConstructorField(QWidget* parent) : QFrame(parent)
++	{
++		QGridLayout *layout = new QGridLayout();
++		layout->setContentsMargins(2, 2, 2, 2);
++		layout->setSpacing(0);
++		for (int i = 0; i < Size * Size; ++i)
++		{
++			Hacked::ArenaCellWidget *f = new Hacked::ArenaCellWidget(this);
++			cells_ << f;
++			layout->addWidget(f, i % Size, i / Size);
++			Hacked::ArenaCellMediator *p = new Hacked::ArenaCellMediator(f, BSPoint(i % Size, i / Size));
++			connect(f, SIGNAL(click()),        p, SLOT(click()));
++			connect(f, SIGNAL(focusEntered()), p, SLOT(focusEntered()));
++			connect(f, SIGNAL(focusLeft()),    p, SLOT(focusLeft()));
++
++			connect(p, SIGNAL(click(BSPoint)),        this, SIGNAL(click(BSPoint)));
++			connect(p, SIGNAL(focusEntered(BSPoint)), this, SIGNAL(focusEntered(BSPoint)));
++			connect(p, SIGNAL(focusLeft(BSPoint)),    this, SIGNAL(focusLeft(BSPoint)));
++		}
++		setLayout(layout);
++
++		setFrameStyle(QFrame::Box | QFrame::Plain);
++		setLineWidth(4);
++
++		setFixedSize(132, 132);
++
++		QPalette p(palette());
++		p.setColor(QPalette::WindowText, QColor(140, 140, 140));
++		setPalette(p);
++	}
++	
++	Hacked::ArenaCellWidget* cell(int x, int y)
++	{
++		if (x < 0 || x >= Size || y < 0 || y >= Size)
++			return NULL;
++		return cells_[y*Size + x];
++	}
++	Hacked::ArenaCellWidget* cell(const BSPoint& p)
++	{
++		return cell(p.x(), p.y());
++	}
++
++signals:
++	void click(BSPoint);          // signal says "something was clicked"
++	void focusEntered(BSPoint);   // signal says "something has got the focus"
++	void focusLeft(BSPoint);      // signal says "something has lost the focus"
++
++private:
++	QVector<Hacked::ArenaCellWidget*> cells_;
++};
++
++
++
++Editor::Editor(QWidget* parent) : QDialog(parent), mode_(ModeEmpty), orient_(Qt::Horizontal), curPoint_(-1, -1)
++{
++	// Need to be set globally
++	color1_ = QColor(150, 160, 200);
++	color2_ = palette().color(QPalette::Background).darker();
++	
++	// Buttons in QHBoxLayout is just a temporary solution 
++	// since I don't want to bother with QToolBar and QActions :)
++	QVBoxLayout* vBox = new QVBoxLayout();
++	setLayout(vBox);
++	
++	QHBoxLayout* hBox = new QHBoxLayout(this);
++	hBox->setSpacing(2);
++	hBox->setMargin(0);
++	btn4_ = new QPushButton("4", this);
++	btn3_ = new QPushButton("3", this);
++	btn2_ = new QPushButton("2", this);
++	btn1_ = new QPushButton("1", this);
++	btnDel_ = new QPushButton("X", this);
++	
++	QButtonGroup* gr = new QButtonGroup();
++	connect(gr, SIGNAL(buttonClicked(QAbstractButton*)), SLOT(btnClicked(QAbstractButton*)));
++
++	QPushButton* btns[] = { btn4_, btn3_, btn2_, btn1_, btnDel_ };
++	for (int i = 0; i < 5; ++i)
++	{
++		QPushButton* btn = btns[i];
++		
++		btn->setMaximumWidth(25);
++		btn->setCheckable(true);
++		hBox->addWidget(btn);
++		gr->addButton(btn);
++	}
++	
++	// 'Done' button
++	btnDone_ = new QPushButton("Done!", this);
++	connect(btnDone_, SIGNAL(clicked()), SLOT(accept()));
++	hBox->addWidget(btnDone_);
++	
++	field_ = new ConstructorField(this);
++	vBox->addLayout(hBox);
++	vBox->addWidget(field_);
++
++	connect(field_, SIGNAL(click(BSPoint)),        SLOT(cellClicked(BSPoint)));
++	connect(field_, SIGNAL(focusEntered(BSPoint)), SLOT(cellEntered(BSPoint)));
++	connect(field_, SIGNAL(focusLeft(BSPoint)),    SLOT(cellLeft(BSPoint)));
++}
++
++
++void Editor::cellEntered(BSPoint p) {
++	// remember the currently entered point
++	curPoint_ = p;
++	
++	if (cellsAreAvailable(p))
++		paintShip(p, color1_);
++}
++
++void Editor::cellLeft(BSPoint p)
++{
++	if (cellsAreAvailable(p))
++		paintShip(p, color2_);
++}
++
++void Editor::cellClicked(BSPoint p)
++{
++	if (mode_ == ShipDelete)
++	{
++		int index = p.y() * Size + p.x();
++		
++		// Find out if the cell with the specified 
++		// 'index' was already stored as a painted one
++		QList< QList<int> >::iterator it = paintedCells_.begin();
++		for (; it != paintedCells_.end(); it++)
++		{
++			if (it->contains(index))
++			{
++				// Yep, we've found a list that contains the 
++				// current cell => we need to delete that set 
++				// and to repaint these cells
++				
++				foreach(int cellIndex, *it)
++				{
++					field_->cell(cellIndex % Size, cellIndex / Size)->set_color(color2_);
++				}
++				
++				paintedCells_.erase(it);
++				return;
++			}
++		}
++	}
++	else
++	{
++		paintShip(p, color1_, true);
++	}
++}
++
++	// This slot is triggered when some 'toolbar' button is pressed
++void Editor::btnClicked(QAbstractButton* btn) {
++	if (btn == btn4_)
++	{
++		mode_ = Ship4Cells;
++	}
++	else if (btn == btn3_)
++	{
++		mode_ = Ship3Cells;
++	}
++	else if (btn == btn2_)
++	{
++		mode_ = Ship2Cells;
++	}
++	else if (btn == btn1_)
++	{
++		mode_ = Ship1Cells;
++	}
++	else if (btn == btnDel_)
++	{
++		mode_ = ShipDelete;
++	}
++	else
++	{
++		mode_ = ModeEmpty;
++	}
++}
++
++void Editor::keyPressEvent(QKeyEvent* e)
++{
++	// Rotate the ship
++	if (e->key() == Qt::Key_R)
++	{
++		paintShip(curPoint_, color2_);
++		orient_ = (orient_ == Qt::Vertical ? Qt::Horizontal : Qt::Vertical);
++		paintShip(curPoint_, color1_);
++	}
++}
++
++
++bool Editor::cellIsPainted(int index)
++{
++	foreach (QList<int> set, paintedCells_)
++		if (set.contains(index))
++			return true;
++	return false;
++}
++
++// Returns whether we can paint a ship with 
++// current length and current orientation starting with point 'p'
++bool Editor::cellsAreAvailable(const BSPoint& p)
++{
++	// We know current length and orientation => we may 
++	// calculate all the cells we need and then check for 
++	// their availability
++	
++	int length = currentLength(mode_);
++	if (length <= 0)
++		return true;
++	
++	if (orient_ == Qt::Vertical)
++	{
++		for (int i = 0; i < length; ++i)
++		{
++			if (cellIsPainted( (p.y() + i) * Size + p.x() ))
++			{
++				// One of the cells that we need to build a ship is 
++				// already painted => we can't place a ship here
++				return false;
++			}
++		}
++	}
++	else
++	{
++		for (int i = 0; i < length; ++i)
++		{
++			if (cellIsPainted( p.y() * Size + p.x() + i))
++			{
++				// One of the cells that we need to build a ship is 
++				// already painted => we can't place a ship here
++				return false;
++			}
++		}
++	}
++	return true;
++}
++
++	// Paints the ship of current length and current orientation 
++	// with given color and stores it if it's necessary.
++void Editor::paintShip(BSPoint p, const QColor& color, bool store) {
++	int length = currentLength(mode_);
++	
++	if (length > 0)
++	{
++		if (orient_ == Qt::Vertical)
++		{
++			if (p.y() + length > Size)
++				return;
++			else
++			{
++				QList<int> set;
++				for (int i = 0; i < length; ++i)
++				{
++					field_->cell(p.x(), p.y() + i)->set_color(color);
++					if (store)
++						set.append( (p.y() + i) * Size + p.x());
++				}
++				if (!set.isEmpty())
++					paintedCells_ << set;
++			}
++		}
++		else
++		{
++			if (p.x() + length > Size)
++				return;
++			else
++			{
++				QList<int> set;
++				for (int i = 0; i < length; ++i)
++				{
++					field_->cell(p.x() + i, p.y())->set_color(color);
++					if (store)
++						set.append( p.y() * Size + p.x() + i);
++				}
++				if (!set.isEmpty())
++					paintedCells_ << set;
++			}
++		}
++	}
++}
++
++int Editor::currentLength(Mode mode)
++{
++	switch (mode)
++	{
++		case Ship4Cells : return 4;
++		case Ship3Cells : return 3;
++		case Ship2Cells : return 2;
++		case Ship1Cells : return 1;
++		default: return 0;
++	}
++}
++
++
++
++
++/*int main(int argc, char* argv[])
++{
++	QApplication app(argc, argv);
++	Constructor c;
++	c.show();
++	return app.exec();
++}*/
++
++#include "editor.moc"
+Index: src/editor/arenawidget_hacked.cpp
+===================================================================
+--- src/editor/arenawidget_hacked.cpp	(revision 0)
++++ src/editor/arenawidget_hacked.cpp	(revision 0)
+@@ -0,0 +1,288 @@
++/*
++ * Copyright 2010 Alexey Michurin
++ *
++ * This file is part of FairSeaBattle.
++ *
++ * FairSeaBattle is free software: you can redistribute
++ * it and/or modify it under the terms of the
++ * GNU General Public License as published by
++ * the Free Software Foundation, either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * FairSeaBattle is distributed in the hope that
++ * it will be useful, but WITHOUT ANY WARRANTY;
++ * without even the implied warranty of MERCHANTABILITY
++ * or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the
++ * GNU General Public License along with FairSeaBattle.
++ * If not, see <http://www.gnu.org/licenses/>.
++ */
++#include "arenawidget_hacked.h"
++#include <QGridLayout>
++#include <QSizePolicy>
++
++namespace Hacked {
++
++//template class BSMap<ArenaCellWidget>;
++
++// ================================================
++
++ArenaCellWidget::ArenaCellWidget(QWidget * parent, Qt::WindowFlags flags) :
++    QFrame(parent, flags),
++    tik_count(0),
++    target_color(102, 102, 102),
++    source_color(102, 102, 102),
++    color_update_mode(update_mode_smooth),
++    timer_id(0)
++{
++    setFrameStyle(QFrame::Panel | QFrame::Raised);
++    setLineWidth(1);
++    setAutoFillBackground(true);
++    set_color(target_color);
++}
++
++// ---------------
++
++void
++ArenaCellWidget::mousePressEvent(QMouseEvent *) {
++    emit click();
++}
++
++void
++ArenaCellWidget::enterEvent(QEvent *e) {
++    update_color();
++    emit focusEntered();
++}
++
++void
++ArenaCellWidget::leaveEvent(QEvent *e) {
++    update_color();
++    emit focusLeft();
++}
++
++void
++ArenaCellWidget::timerEvent(QTimerEvent *) {
++    one_step();
++}
++
++// ---------------
++
++void
++ArenaCellWidget::changeColor(ColorStrategy const & c) {
++    source_color = palette().color(QPalette::Background);
++    target_color = c.color();
++    color_update_mode = c.mode();
++    tik_count = 0;
++    one_step();
++}
++
++// ---------------
++
++void
++ArenaCellWidget::one_step() {
++    //   
++    switch (color_update_mode) {
++        case update_mode_blink:
++            if (tik_count % 2 == 0) {
++                set_color(target_color);
++            } else {
++                set_mix_color(QColor(255, 255, 255), target_color);
++            }
++            break;
++        case update_mode_smooth:
++            set_mix_color(source_color, target_color);
++            break;
++    }
++    //   --  
++    if (tik_count == 10 && timer_id != 0) {
++        killTimer(timer_id);
++        timer_id = 0;
++    } else {
++        //     ,   &#1891; 
++        ++tik_count;
++        //   ( &#1891;  )
++        if (timer_id == 0) {
++            timer_id = startTimer(100);
++        }
++    }
++}
++
++void
++ArenaCellWidget::set_color(QColor const & c) {
++    QPalette p(palette());
++    p.setColor(QPalette::Background, c);
++    setPalette(p);
++    update_color();
++}
++
++void
++ArenaCellWidget::set_mix_color(QColor const & s, QColor const & t) {
++    int a(10 - tik_count);
++    int b(tik_count);
++    set_color(QColor(( a * s.red()   + b * t.red()   )/10,
++                     ( a * s.green() + b * t.green() )/10,
++                     ( a * s.blue()  + b * t.blue()  )/10 ));
++}
++
++void
++ArenaCellWidget::update_color() {
++    QPalette p(palette());
++    QColor a = p.color(QPalette::Background);
++    if (underMouse()) {
++        p.setColor(QPalette::Light, a);
++        p.setColor(QPalette::Dark, a);
++    } else {
++        p.setColor(QPalette::Light, a.lighter());
++        p.setColor(QPalette::Dark, a.darker());
++    }
++    setPalette(p);
++}
++
++// ================================================
++
++ArenaCellMediator::ArenaCellMediator(QObject * qo, const BSPoint & p) :
++    QObject(qo),
++    location(p)
++{
++}
++
++void
++ArenaCellMediator::click() {
++    emit click(location);
++}
++
++void
++ArenaCellMediator::focusEntered() {
++    emit focusEntered(location);
++}
++
++void
++ArenaCellMediator::focusLeft() {
++    emit focusLeft(location);
++}
++
++// ================================================
++
++ArenaWidget::ArenaWidget(QWidget * parent, Qt::WindowFlags flags) :
++    QFrame(parent, flags),
++    fmap(BSRect(10)),
++    is_active(false),
++    timer_id(0)
++{
++    QGridLayout *layout = new QGridLayout();
++    layout->setContentsMargins(2, 2, 2, 2);
++    layout->setSpacing(0);
++
++    for (BSRect::iter i(fmap.get_rect()); i(); ++i) {
++        ArenaCellWidget *f = new ArenaCellWidget(this);
++        f->installEventFilter(this);
++        *fmap[*i] = f;
++        layout->addWidget(f, (*i).y(), (*i).x());
++        ArenaCellMediator *p = new ArenaCellMediator(f, *i);
++        QObject::connect(f, SIGNAL(click()),
++                         p, SLOT(click()));
++        QObject::connect(f, SIGNAL(focusEntered()),
++                         p, SLOT(focusEntered()));
++        QObject::connect(f, SIGNAL(focusLeft()),
++                         p, SLOT(focusLeft()));
++
++        QObject::connect(p, SIGNAL(click(BSPoint)),
++                         this, SLOT(accept_click(BSPoint)));
++        QObject::connect(p, SIGNAL(focusEntered(BSPoint)),
++                         this, SLOT(accept_enter(BSPoint)));
++        QObject::connect(p, SIGNAL(focusLeft(BSPoint)),
++                         this, SLOT(accept_leave(BSPoint)));
++    }
++    setLayout(layout);
++
++    setFrameStyle(QFrame::Box | QFrame::Plain);
++    setLineWidth(4);
++
++    setFixedSize(132, 132);
++
++    QPalette p(palette());
++    p.setColor(QPalette::WindowText, QColor(140, 140, 140));
++    setPalette(p);
++    activate();
++}
++
++void
++ArenaWidget::timerEvent(QTimerEvent *) {
++    one_step();
++}
++
++void
++ArenaWidget::one_step() {
++    QPalette p(palette());
++    QColor c(p.color(QPalette::WindowText));
++    int v(c.red());
++    v = (v/20 + (is_active?-1:1))*20;
++    p.setColor(QPalette::WindowText, QColor(v, v, v));
++    setPalette(p);
++    if ((v <= 80 || v >= 200) && timer_id != 0) {
++        killTimer(timer_id);
++        timer_id = 0;
++    } else {
++        if (timer_id == 0) {
++            timer_id = startTimer(100);
++        }
++    }
++}
++
++void
++ArenaWidget::change_color(BSPoint p, ColorStrategy c) {
++    (*fmap[p])->changeColor(c);
++}
++
++void
++ArenaWidget::clear() {
++    ColorStrategy const c;
++    for (BSRect::iter i(fmap.get_rect()); i(); ++i) {
++        (*fmap[*i])->changeColor(c);
++    }
++}
++
++void
++ArenaWidget::activate() {
++    if (! is_active) {
++        is_active = true;
++        setCursor(Qt::PointingHandCursor);
++        one_step();
++    }
++}
++
++void
++ArenaWidget::deactivate() {
++    if (is_active) {
++        is_active = false;
++        setCursor(Qt::ForbiddenCursor);
++        one_step();
++    }
++}
++
++// --- slots ---
++
++void
++ArenaWidget::accept_click(BSPoint p) {
++    if (is_active) {
++        emit click(p);
++    }
++}
++
++void
++ArenaWidget::accept_enter(BSPoint p) {
++    if (is_active) {
++        emit enter(p);
++    }
++}
++
++void
++ArenaWidget::accept_leave(BSPoint p) {
++    if (is_active) {
++        emit leave(p);
++    }
++}
++
++} // namespace Hacked
+Index: src/editor/editor.h
+===================================================================
+--- src/editor/editor.h	(revision 0)
++++ src/editor/editor.h	(revision 0)
+@@ -0,0 +1,93 @@
++/*
++ * Copyright 2010 Mikhail Murzin
++ *
++ * This file is part of FairSeaBattle.
++ *
++ * FairSeaBattle is free software: you can redistribute
++ * it and/or modify it under the terms of the
++ * GNU General Public License as published by
++ * the Free Software Foundation, either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * FairSeaBattle is distributed in the hope that
++ * it will be useful, but WITHOUT ANY WARRANTY;
++ * without even the implied warranty of MERCHANTABILITY
++ * or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the
++ * GNU General Public License along with FairSeaBattle.
++ * If not, see <http://www.gnu.org/licenses/>.
++ */
++ 
++#ifndef __FSB_EDITOR_H__
++#define __FSB_EDITOR_H__
++
++class QAbstractButton;
++class QPushButton;
++class ConstructorField;
++
++#include "geometry.h"
++
++#include <QDialog>
++
++class Editor : public QDialog
++{
++Q_OBJECT
++	// Enumerates possible modes selected by the toolbar
++	typedef enum {
++		ModeEmpty,
++		Ship4Cells,
++		Ship3Cells,
++		Ship2Cells,
++		Ship1Cells,
++		ShipDelete,
++	} Mode;
++
++public:
++	Editor(QWidget*);
++
++public slots:
++	void cellEntered(BSPoint p);
++
++	void cellLeft(BSPoint p);
++
++	void cellClicked(BSPoint p);
++
++	// This slot is triggered when some 'toolbar' button is pressed
++	void btnClicked(QAbstractButton* btn);
++
++protected:
++	virtual void keyPressEvent(QKeyEvent* e);
++
++private:
++	QColor color1_;
++	QColor color2_;
++
++	bool cellIsPainted(int index);
++
++	// Returns whether we can paint a ship with 
++	// current length and current orientation starting with point 'p'
++	bool cellsAreAvailable(const BSPoint& p);
++
++	// Paints the ship of current length and current orientation 
++	// with given color and stores it if it's necessary.
++	void paintShip(BSPoint p, const QColor& color, bool store = false);
++
++	int currentLength(Mode mode);
++
++	Mode mode_;
++	Qt::Orientation orient_;
++	BSPoint curPoint_;
++	QList< QList<int> > paintedCells_;
++	
++	QPushButton* btn4_;
++	QPushButton* btn3_;
++	QPushButton* btn2_;
++	QPushButton* btn1_;
++	QPushButton* btnDel_;
++	QPushButton* btnDone_;
++	ConstructorField* field_;
++};
++
++#endif // __FSB_EDITOR_H__
+Index: src/fairseabattle.cpp
+===================================================================
+--- src/fairseabattle.cpp	(revision 4)
++++ src/fairseabattle.cpp	(working copy)
+@@ -123,6 +123,11 @@
+     m->addAction(a);
+     t->addAction(a);
+ 
++    a = new QAction(QIcon(), QObject::tr("Launch editor"), &main_window);
++    QObject::connect(a, SIGNAL(triggered()), ctrl, SLOT(launch_editor()));
++    m->addAction(a);
++    t->addAction(a);
++
+     a = new QAction(QIcon(":/images/go.png"), QObject::tr("Check and start game"), &main_window);
+     a->setShortcut(Qt::CTRL+Qt::Key_C);
+     QObject::connect(a, SIGNAL(triggered()), ctrl, SLOT(check_and_start_game()));

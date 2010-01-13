@@ -1,16 +1,10 @@
-FairSeaBattle 1.0 pre1
-----------------------
+FairSeaBattle
+-------------
 
 The FairSeaBattle -- sink the computer's fleet.
 
-    Remember that this versions _is_not_ RELEASE yet.
-    It is PRE-RELEASE versions. In an effort to
-    provide quality software at release time I will
-    PRE-RELEASE one for bug checking. Please submit
-    bugs by sending an e-mail to me: a.michurin@gmail.com
-    Thanks a lot!
-
-You can get FairSeaBattle here: http://fairseabattle.googlecode.com/
+You can get FairSeaBattle here:
+http://fairseabattle.googlecode.com/
 
 Licensing
 ---------
@@ -35,19 +29,27 @@ Before building, you will need to have the Qt4 library installed
 on your system (http://www.trolltech.com/).
 
 Build:
+
 $ qmake # or qmake-qt4
 $ make  # or mingw32-make or nmake or other
 
 Test it:
+
 $ ./fairseabattle
 
 Install:
+
 $ sudo cp ./fairseabattle /usr/local/bin/fairseabattle
-or
+
+or same
 $ sudo make install
-or
-$ sudo make INSTALL_ROOT=/opt/bin install
+
+you can specify root dir of installation
+if you want to prepare package or just
+have reasons to do this
+$ sudo make INSTALL_ROOT=/opt install
 
 Enjoy!
+
 Alexey Michurin
 a.michurin@gmail.com

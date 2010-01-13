@@ -2,7 +2,13 @@
 
 VERSION = '1.0'
 PRERELEASE = '4'
-COMPILE_DEBUG_IO = 'NO' # 'YES'
+COMPILE_DEBUG_IO = 'NO'
+#
+# You can compile application with debugging output.
+# Corresponding sources are available in SVN or in
+# special source packages.
+#
+# COMPILE_DEBUG_IO = 'YES'
 
 TEMPLATE = app
 # -Wextra -Weffc++
@@ -68,3 +74,30 @@ unix {
   message("No install target for your platform.")
   message("Install FairSeaBattle manualy.")
 }
+
+#
+# extra target sdist: source distribution
+#
+SOURCE_DIST = $${TARGET}-$${VERSION}
+SOURCE_DIST_EXT = .tar.gz
+!isEmpty(PRERELEASE) {
+  SOURCE_DIST = $${SOURCE_DIST}pre$${PRERELEASE}
+}
+SOURCE_FILES = $$DISTFILES $$SOURCES $$HEADERS $$RESOURCES $${TARGET}.pro
+
+source_dist_root.target = sdist
+source_dist_root.depends = $${SOURCE_DIST}$${SOURCE_DIST_EXT}
+
+source_dist.target = $$source_dist_root.depends
+source_dist.depends = $$SOURCE_FILES
+source_dist.commands  = '$(CHK_DIR_EXISTS) $${SOURCE_DIST} && exit 1;'
+source_dist.commands += 'for i in $$source_dist.depends;'
+source_dist.commands += 'do'
+source_dist.commands += "$(MKDIR) `dirname $${SOURCE_DIST}/\$\$i`;"
+source_dist.commands += '$(COPY) \$\$i $${SOURCE_DIST}/\$\$i;'
+source_dist.commands += 'done;'
+source_dist.commands += 'echo $$SOURCE_FILES | tr " " "\\n" | sort >$${SOURCE_DIST}/MANIFEST;'
+source_dist.commands += '$(TAR) $${SOURCE_DIST}.tar $${SOURCE_DIST};'
+source_dist.commands += '$(COMPRESS) $${SOURCE_DIST}.tar;'
+
+QMAKE_EXTRA_TARGETS += source_dist_root source_dist

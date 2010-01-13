@@ -1,0 +1,37 @@
+-----------------------
+Patch by Mikhail Murzin
+-----------------------
+
+This patch shows original view to editing procedure.
+It allow you to set up ships not dot-by-dot, but as
+solid objects. In many cases this method is faster
+and more convenient.
+
+You can test this method. If you feel it good, you
+can write to me, and force me to pay more attantion
+to this editor.
+
+NOTE: This patch not ready to use in production,
+it shows only prototype.
+
+--------------
+How to test it
+--------------
+
+Get revision 4 of sources:
+
+$ svn checkout -r4 http://fairseabattle.googlecode.com/svn/trunk/ fairseabattle-read-only
+$ cd fairseabattle-read-only
+
+Apply patch:
+
+$ patch -p0 < (PATH TO PATCH)/editor.patch
+
+Make and start application:
+
+$ qmake # or qmake-qt4 or like this
+$ make  # or mingw32-make or like this
+$ ./fairseabattle 
+
+Enjoy! :-)
+		
