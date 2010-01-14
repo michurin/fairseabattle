@@ -1,0 +1,5 @@
+fairseabattle (1.0-1) stable; urgency=low
+
+  * Initial release, that packed in deb-package
+
+ -- Alexey Michurin <a.michurin@gmail.com>  Thu, 14 Jan 2010 12:00:00 +0400

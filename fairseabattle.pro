@@ -1,14 +1,22 @@
 # Variables
 
 VERSION = '1.0'
-PRERELEASE = '4'
+PRERELEASE = '5'
 COMPILE_DEBUG_IO = 'NO'
+DEPLOYERS_EXTRA_TARGETS = 'NO'
 #
 # You can compile application with debugging output.
 # Corresponding sources are available in SVN or in
 # special source packages.
 #
 # COMPILE_DEBUG_IO = 'YES'
+#
+# You can build packages, but to do it
+# you MUST have complete source tree with
+# developers part. You can get it from SVN.
+#
+# DEPLOYERS_EXTRA_TARGETS = 'YES'
+#
 
 TEMPLATE = app
 # -Wextra -Weffc++
@@ -75,6 +83,7 @@ unix {
   message("Install FairSeaBattle manualy.")
 }
 
+contains(DEPLOYERS_EXTRA_TARGETS, YES) {
 #
 # extra target sdist: source distribution
 #
@@ -101,3 +110,22 @@ source_dist.commands += '$(TAR) $${SOURCE_DIST}.tar $${SOURCE_DIST};'
 source_dist.commands += '$(COMPRESS) $${SOURCE_DIST}.tar;'
 
 QMAKE_EXTRA_TARGETS += source_dist_root source_dist
+#
+# extra target deb: deb distribution
+#
+# NOTE!!!
+# To use it you need
+#   -- deb-based linux (debian, ubuntu, etc.)
+#   -- complete set of sources from SVN
+#
+deb_dist_root.target = deb
+deb_dist_root.commands  = '$(CHK_DIR_EXISTS) debian && exit 1;'
+deb_dist_root.commands += '$(COPY_DIR) devel/debian debian;'
+deb_dist_root.commands += 'chmod 755 debian/rules;'
+deb_dist_root.commands += 'dpkg-buildpackage -b -us -uc -rfakeroot;'
+
+QMAKE_EXTRA_TARGETS += deb_dist_root
+#
+# end of section
+#
+}

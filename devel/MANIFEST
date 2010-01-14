@@ -3,6 +3,13 @@ MANIFEST
 composition/composition.cpp
 composition/composition.h
 composition/composition.pro
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/dirs
+debian/docs
+debian/rules
 gui/gui.cpp
 gui/gui.h
 gui/gui.pro

@@ -1,0 +1,12 @@
+Source: fairseabattle
+Section: x11
+Priority: optional
+Maintainer: Alexey Michurin <a.michurin@gmail.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.0
+Homepage: http://fairseabattle.googlecode.com/
+
+Package: fairseabattle
+Architecture: i386
+Depends: ${shlibs:Depends}, libqtcore4, libqtgui4
+Description: FairSeaBattle is battleship type game you might have played before.
