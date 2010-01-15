@@ -10,6 +10,8 @@ debian/copyright
 debian/dirs
 debian/docs
 debian/rules
+fedora/README
+fedora/fairseabattle.spec
 gui/gui.cpp
 gui/gui.h
 gui/gui.pro

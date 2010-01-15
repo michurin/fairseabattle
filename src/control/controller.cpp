@@ -237,28 +237,28 @@ Controller::right_click(BSPoint p) {
         case BSArena::r_game_over:
             // теперь никто никуда не стреляет
             game_state = gs_view;
-            // arena_h_key or arena_h_puz?
-            for (BSRect::iter i(arena_h_key.get_rect()); i(); ++i) {
-                 BSFlags f(arena_h_key[*i]);
-                 if (f.occupied() && f.fired()) {
-                     emit do_left_change_color(*i,
-                     ColorStrategy(f, update_mode_blink));
-                 }
-            }
             emit do_view_mode();
             break;
         default:
             assert(false);
     }
-//    std::cout << "rght(2): " << p << std::endl;
     BSRect updated_area = arena_h_puz.apply_result(p, r);
-//    std::cout << "rght(3): " << p << std::endl;
     for (BSRect::iter i(updated_area); i(); ++i) {
         emit do_right_change_color(*i,
              ColorStrategy(arena_h_puz[*i],
                            (*i == p) ? update_mode_blink :
                                        update_mode_smooth
                           ));
+    }
+    if (r == BSArena::r_game_over) {
+        // arena_c_key or arena_c_puz?
+        for (BSRect::iter i(arena_c_key.get_rect()); i(); ++i) {
+            BSFlags f(arena_c_key[*i]);
+            if (f.occupied() && f.fired()) {
+                emit do_right_change_color(*i,
+                     ColorStrategy(f, update_mode_blink));
+            }
+        }
     }
 }
 
