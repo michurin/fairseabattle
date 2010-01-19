@@ -7,6 +7,7 @@ UI:
   or small fireworks after win?
 - field editor?
 - palette editor
+- icon for MS Windows
 
 AI:
 - make AI more efficient
@@ -16,7 +17,10 @@ Dist:
 - MS Windows dist as solid exe-file
 
 Network:
-- subj
+- subj... but may be Web?
+
+qmake:
+- move extratargets out from project file
 
 Q:
 - is it good, that BSMap::operator[](...) return T*? not!
