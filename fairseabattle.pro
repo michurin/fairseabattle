@@ -20,9 +20,9 @@ DEPLOYERS_EXTRA_TARGETS = 'NO'
 
 TEMPLATE = app
 # -Wextra -Weffc++
-QMAKE_CXXFLAGS = -Wall
-QMAKE_CXXFLAGS_RELEASE = -Wall
-QT += core gui
+QMAKE_CXXFLAGS = -Wall -Wextra -Weffc++
+QMAKE_CXXFLAGS_RELEASE = -Wall -Wextra -Weffc++
+QT += core gui widgets
 CONFIG += release warn_on qt debug
 OBJECTS_DIR = build
 MOC_DIR = build
