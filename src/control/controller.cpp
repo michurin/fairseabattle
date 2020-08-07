@@ -46,7 +46,8 @@ Controller::Controller(QObject * parent) :
     QObject(parent),
     timer(new QTimer(this)),
     game_state(gs_edit),
-    is_human_acts_first(true),
+    battle_state(bs_wait_human),
+    is_human_acts_first(battle_state == bs_wait_human),
     legend_variant(0),
     arena_h_key(10, legend[legend_variant]),
     arena_h_puz(10, legend[legend_variant]),
@@ -99,7 +100,7 @@ Controller::computer_fire() {
             start_thinking(); // call slot as method; not true way
             break;
         case BSArena::r_game_over:
-            // ÔÅÐÅÒØ ÎÉËÔÏ ÎÉËÕÄÁ ÎÅ ÓÔÒÅÌÑÅÔ
+            // Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð½Ð¸ÐºÑ‚Ð¾ Ð½Ð¸ÐºÑƒÐ´Ð° Ð½Ðµ ÑÑ‚Ñ€ÐµÐ»ÑÐµÑ‚
             game_state = gs_view;
             for (BSRect::iter i(arena_c_key.get_rect()); i(); ++i) {
                  if (arena_c_key[*i].occupied() && !arena_c_key[*i].fired()) {
@@ -165,10 +166,10 @@ Controller::check_and_start_game() {
     arena_h_puz.load_legend(legend[legend_variant]);
     arena_c_puz.load_legend(legend[legend_variant]);
     if (arena_h_key.check()) {
-        // ÐÏÈÏÒÏÛÅÍÕ, ×ÅÚÄÅ ÎÁÄÏ ÐÏÓÔÕÐÁÔØ ÉÍÅÎÎÏ ÔÁË:
-        // ÚÄÅÓØ ÔÏÌØËÏ ÜÍÉÔÉÒÏ×ÁÔØ ÓÉÇÎÁÌ,
-        // Á ×ÓÅ ÄÅÊÓÔ×ÉÑ, Ó×ÑÚÁÎÎÙÅ Ó ÜÔÉÍ ÓÉÇÎÁÌÏÍ
-        // ÎÁÄÏ ÐÒÏ×ÏÄÉÔØ ÏÔÄÅÌØÎÏ; × ÏÂÒÁÂÏÔÞÉËÅ ÓÉÇÎÁÌÁ
+        // Ð¿Ð¾Ñ…Ð¾Ñ€Ð¾ÑˆÐµÐ¼Ñƒ, Ð²ÐµÐ·Ð´Ðµ Ð½Ð°Ð´Ð¾ Ð¿Ð¾ÑÑ‚ÑƒÐ¿Ð°Ñ‚ÑŒ Ð¸Ð¼ÐµÐ½Ð½Ð¾ Ñ‚Ð°Ðº:
+        // Ð·Ð´ÐµÑÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ ÑÐ¼Ð¸Ñ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ ÑÐ¸Ð³Ð½Ð°Ð»,
+        // Ð° Ð²ÑÐµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ, ÑÐ²ÑÐ·Ð°Ð½Ð½Ñ‹Ðµ Ñ ÑÑ‚Ð¸Ð¼ ÑÐ¸Ð³Ð½Ð°Ð»Ð¾Ð¼
+        // Ð½Ð°Ð´Ð¾ Ð¿Ñ€Ð¾Ð²Ð¾Ð´Ð¸Ñ‚ÑŒ Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾; Ð² Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸ÐºÐµ ÑÐ¸Ð³Ð½Ð°Ð»Ð°
         emit do_battle_mode();
     } else {
         emit alert_field_incorrect();
@@ -185,7 +186,7 @@ void
 Controller::set_rules(QAction * a) {
     legend_variant = a->actionGroup()->actions().indexOf(a);
 //    std::cout << "RULES: " << legend_variant << std::endl;
-    // ÐÒÁ×ÉÌÁ ×ÓÔÕÐÁÀÔ × ÓÉÌÕ ÎÅ ÓÅÊÞÁÓ, Á ÔÏÌØËÏ ÐÒÉ ÒÅÓÔÁÒÔÅ!
+    // Ð¿Ñ€Ð°Ð²Ð¸Ð»Ð° Ð²ÑÑ‚ÑƒÐ¿Ð°ÑŽÑ‚ Ð² ÑÐ¸Ð»Ñƒ Ð½Ðµ ÑÐµÐ¹Ñ‡Ð°Ñ, Ð° Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¿Ñ€Ð¸ Ñ€ÐµÑÑ‚Ð°Ñ€Ñ‚Ðµ!
     if (game_state != gs_edit) {
         emit alert_postpone_rules();
     }
@@ -226,16 +227,16 @@ Controller::right_click(BSPoint p) {
             return;
         case BSArena::r_milk:
         case BSArena::r_wasted_effort:
-            // ÔÅÐÅÒØ ÓÔÒÅÌÑÅÔ ËÏÍÐØÀÔÅÒ
+            // Ñ‚ÐµÐ¿ÐµÑ€ÑŒ ÑÑ‚Ñ€ÐµÐ»ÑÐµÑ‚ ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€
             battle_state = bs_wait_comp;
             emit wait_comp();
             break;
         case BSArena::r_continue_in_that_direction:
         case BSArena::r_drowned:
-            // ÐÒÉÚÏ×ÏÊ ×ÙÓÔÒÅÌ (ÒÅÖÉÍ ÎÅ ÍÅÎÑÅÔÓÑ)
+            // Ð¿Ñ€Ð¸Ð·Ð¾Ð²Ð¾Ð¹ Ð²Ñ‹ÑÑ‚Ñ€ÐµÐ» (Ñ€ÐµÐ¶Ð¸Ð¼ Ð½Ðµ Ð¼ÐµÐ½ÑÐµÑ‚ÑÑ)
             break;
         case BSArena::r_game_over:
-            // ÔÅÐÅÒØ ÎÉËÔÏ ÎÉËÕÄÁ ÎÅ ÓÔÒÅÌÑÅÔ
+            // Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð½Ð¸ÐºÑ‚Ð¾ Ð½Ð¸ÐºÑƒÐ´Ð° Ð½Ðµ ÑÑ‚Ñ€ÐµÐ»ÑÐµÑ‚
             game_state = gs_view;
             emit do_view_mode();
             break;

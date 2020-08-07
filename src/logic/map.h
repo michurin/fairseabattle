@@ -33,7 +33,8 @@ public:
     BSMap(BSRect const & r);
     BSMap(const BSMap &); /// IMPLEMENT IT!!
     ~BSMap();
-    T * const operator[](BSPoint const & p) const;
+    const T *operator [](BSPoint const & p) const;
+    T* operator [](BSPoint const & p);
     BSRect get_rect() const;
     BSMap & operator=(const BSMap &); /// IMPLEMENT IT!!
 //    BSMap * operator&(); /// IMPLEMENT IT!?
@@ -51,8 +52,14 @@ template<class T>
 BSMap<T>::~BSMap() { delete[] field_map; }
 
 template<class T>
-T * const
+T const *
 BSMap<T>::operator[](BSPoint const & p) const {
+    return field_map + rect.idx(p);
+}
+
+template<class T>
+T *
+BSMap<T>::operator[](BSPoint const & p) {
     return field_map + rect.idx(p);
 }
 

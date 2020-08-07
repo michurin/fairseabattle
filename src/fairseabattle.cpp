@@ -39,22 +39,22 @@ int main(int argc, char **argv)
 
     QApplication app(argc, argv);
 
-    // ÓÏÚÄÁ£Í ÏËÎÏ ÐÒÉÌÏÖÅÎÉÑ
+    // ÑÐ¾Ð·Ð´Ð°Ñ‘Ð¼ Ð¾ÐºÐ½Ð¾ Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ
     QMainWindow main_window;
     main_window.setWindowTitle(QObject::tr("Fair Sea Battle"));
     main_window.layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-    // ÓÏÚÄÁ£Í ËÏÎÔÒÏÌÌÅÒ
+    // ÑÐ¾Ð·Ð´Ð°Ñ‘Ð¼ ÐºÐ¾Ð½Ñ‚Ñ€Ð¾Ð»Ð»ÐµÑ€
     Controller * ctrl = new Controller(&main_window);
 
-    // ÓÏÚÄÁ£Í É Ó×ÑÚÙ×ÁÅÍ ÎÔÉÆÉËÁÔÏÒ
+    // ÑÐ¾Ð·Ð´Ð°Ñ‘Ð¼ Ð¸ ÑÐ²ÑÐ·Ñ‹Ð²Ð°ÐµÐ¼ Ð½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€
     Alerter * alert = new Alerter(&main_window);
 
     QObject::connect(ctrl, SIGNAL(alert_field_incorrect()), alert, SLOT(invalid_field_setup()));
     QObject::connect(ctrl, SIGNAL(alert_postpone_rules()), alert, SLOT(postpone_rules()));
     QObject::connect(ctrl, SIGNAL(alert_already_fired()), alert, SLOT(field_already_fired()));
 
-    // ÓÏÚÄÁ£Í ÁÒÅÎÙ
+    // ÑÐ¾Ð·Ð´Ð°Ñ‘Ð¼ Ð°Ñ€ÐµÐ½Ñ‹
     ArenaWidget * left_arena = new ArenaWidget;
     ArenaWidget * right_arena = new ArenaWidget;
 
@@ -63,22 +63,22 @@ int main(int argc, char **argv)
     QObject::connect(ctrl, SIGNAL(do_right_change_color(BSPoint, ColorStrategy)), right_arena, SLOT(change_color(BSPoint, ColorStrategy)));
     QObject::connect(right_arena, SIGNAL(click(BSPoint)), ctrl, SLOT(right_click(BSPoint)));
 
-    // Ó×ÑÚÙ×ÁÅÍ ÁÒÅÎÙ
-    // ÐÅÒÅÈÏÄÑ × ÒÅÖÉÍ ÒÅÄÁËÔÉÒÏ×ÁÎÉÑ ÐÅÒÅÁËÔÉ×ÉÒÕÅÍ ÐÏÌÑ É ÏÔÞÉÝÁÅÍ ÉÈ
+    // ÑÐ²ÑÐ·Ñ‹Ð²Ð°ÐµÐ¼ Ð°Ñ€ÐµÐ½Ñ‹
+    // Ð¿ÐµÑ€ÐµÑ…Ð¾Ð´Ñ Ð² Ñ€ÐµÐ¶Ð¸Ð¼ Ñ€ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð¿ÐµÑ€ÐµÐ°ÐºÑ‚Ð¸Ð²Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ð¾Ð»Ñ Ð¸ Ð¾Ñ‚Ñ‡Ð¸Ñ‰Ð°ÐµÐ¼ Ð¸Ñ…
     QObject::connect(ctrl, SIGNAL(do_edit_mode()), left_arena, SLOT(activate()));
     QObject::connect(ctrl, SIGNAL(do_edit_mode()), right_arena, SLOT(deactivate()));
     QObject::connect(ctrl, SIGNAL(do_edit_mode()), left_arena, SLOT(clear()));
     QObject::connect(ctrl, SIGNAL(do_edit_mode()), right_arena, SLOT(clear()));
-    // ÐÒÉ ÎÁÞÁÌÅ ÂÁÔÁÌÉÉ ÇÁÓÉÍ ÏÄÎÏ ÐÏÌÅ
+    // Ð¿Ñ€Ð¸ Ð½Ð°Ñ‡Ð°Ð»Ðµ Ð±Ð°Ñ‚Ð°Ð»Ð¸Ð¸ Ð³Ð°ÑÐ¸Ð¼ Ð¾Ð´Ð½Ð¾ Ð¿Ð¾Ð»Ðµ
     QObject::connect(ctrl, SIGNAL(do_battle_mode()), left_arena, SLOT(deactivate()));
     // we do not care about right field on do_battle_mode()
-    // Á ×ÏÔ ÐÒÉ ÓÔÒÅÌØÂÅ ÁËÔÉ×ÉÚÉÒÕÅÍ ÐÒÁ×ÏÅ
+    // Ð° Ð²Ð¾Ñ‚ Ð¿Ñ€Ð¸ ÑÑ‚Ñ€ÐµÐ»ÑŒÐ±Ðµ Ð°ÐºÑ‚Ð¸Ð²Ð¸Ð·Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ñ€Ð°Ð²Ð¾Ðµ
     QObject::connect(ctrl, SIGNAL(wait_human()), right_arena, SLOT(activate()));
     QObject::connect(ctrl, SIGNAL(wait_comp()), right_arena, SLOT(deactivate()));
-    // ÎÁ ×ÓÑËÉÊ ÓÌÕÞÁÊ ÄÅÁËÔÉ×ÉÒÕÅÍ ÐÒÁ×ÏÅ, ÌÅ×ÏÅ É ÔÁË ÎÅ ÁËÔÉ×ÎÏ
+    // Ð½Ð° Ð²ÑÑÐºÐ¸Ð¹ ÑÐ»ÑƒÑ‡Ð°Ð¹ Ð´ÐµÐ°ÐºÑ‚Ð¸Ð²Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ñ€Ð°Ð²Ð¾Ðµ, Ð»ÐµÐ²Ð¾Ðµ Ð¸ Ñ‚Ð°Ðº Ð½Ðµ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾
     QObject::connect(ctrl, SIGNAL(do_view_mode()), right_arena, SLOT(deactivate()));
 
-    // ÒÁÚÍÅÝÁÅÍ ÁÒÅÎÙ
+    // Ñ€Ð°Ð·Ð¼ÐµÑ‰Ð°ÐµÐ¼ Ð°Ñ€ÐµÐ½Ñ‹
     QFrame * central_widget = new QFrame();
     QBoxLayout * layout = new QBoxLayout(QBoxLayout::LeftToRight);
     layout->setSizeConstraint(QLayout::SetFixedSize);
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     central_widget->setLayout(layout);
     main_window.setCentralWidget(central_widget);
 
-    // ÓÏÚÁÄ£Í ÍÅÎÀ
+    // ÑÐ¾Ð·Ð°Ð´Ñ‘Ð¼ Ð¼ÐµÐ½ÑŽ
     BooleanMediator *med;
     QAction *a;
     QMenu *m;
@@ -97,8 +97,8 @@ int main(int argc, char **argv)
 
     m = mbar->addMenu(QObject::tr("Game"));
 
-    // ÎÁÞÁÌØÎÏÅ ÐÏÌÏÖÅÎÉÅ ÔÕÌÂÁÒÁ ÎÁÄÏ ÂÒÁÔØ
-    // ÉÚ ctrl (ËÏÇÄÁ ÏÎÏ ÔÁÍ ÐÏÑ×ÉÔÓÑ :-))
+    // Ð½Ð°Ñ‡Ð°Ð»ÑŒÐ½Ð¾Ðµ Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ñ‚ÑƒÐ»Ð±Ð°Ñ€Ð° Ð½Ð°Ð´Ð¾ Ð±Ñ€Ð°Ñ‚ÑŒ
+    // Ð¸Ð· ctrl (ÐºÐ¾Ð³Ð´Ð° Ð¾Ð½Ð¾ Ñ‚Ð°Ð¼ Ð¿Ð¾ÑÐ²Ð¸Ñ‚ÑÑ :-))
     main_window.addToolBar(Qt::BottomToolBarArea, t);
     t->setAllowedAreas(Qt::AllToolBarAreas);
 

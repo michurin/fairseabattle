@@ -53,7 +53,7 @@ protected:
     void timerEvent(QTimerEvent * event);
 
 public:
-    ArenaCellWidget(QWidget * parent = 0, Qt::WindowFlags f = 0);
+    ArenaCellWidget(QWidget * parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
 
 //    ArenaCellWidget(const ArenaCellWidget &);
 //    ArenaCellWidget & operator=(const ArenaCellWidget &);
@@ -101,7 +101,7 @@ protected:
     void timerEvent(QTimerEvent * event);
 
 public:
-    ArenaWidget(QWidget * parent = 0, Qt::WindowFlags f = 0);
+    ArenaWidget(QWidget * parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
 
 public slots:
     void accept_click(BSPoint);
