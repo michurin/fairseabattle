@@ -34,7 +34,8 @@ DEFINES += FAIRSEABATTLEVERSION=$$VERSION
 }
 DEPENDPATH += src/logic src/control src/gui
 INCLUDEPATH += src/logic src/control src/gui
-DISTFILES += COPYING MANIFEST README
+DISTFILES += COPYING MANIFEST \
+    README.md
 DISTFILES += images/new.png \
              images/auto.png \
              images/go.png
