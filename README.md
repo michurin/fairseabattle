@@ -1,13 +1,22 @@
-FairSeaBattle
--------------
+# FairSeaBattle
 
 The FairSeaBattle -- sink the computer's fleet.
 
 You can get FairSeaBattle here:
-http://fairseabattle.googlecode.com/
 
-Licensing
----------
+* http://fairseabattle.googlecode.com/
+* https://github.com/h4tr3d/fairseabattle
+
+Last official sources:
+
+* [sources](http://user.rol.ru/~alvm/fairseabattle-1.0pre2.tar.gz)
+* [Windows Binaries](http://user.rol.ru/~alvm/fairseabattle-1.0pre2.zip)
+
+Russian announce:
+
+* <https://habr.com/ru/post/80155/>
+
+## Licensing
 
 FairSeaBattle is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,32 +31,43 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with FairSeaBattle.  If not, see <http://www.gnu.org/licenses/>.
 
-Building
---------
+## Building
 
 Before building, you will need to have the Qt4 library installed
-on your system (http://www.trolltech.com/).
+on your system (<http://www.trolltech.com/>).
 
 Build:
 
-$ qmake # or qmake-qt4
-$ make  # or mingw32-make or nmake or other
+```sh
+qmake # or qmake-qt5
+make  # or mingw32-make or nmake or other
+```
 
 Test it:
 
-$ ./fairseabattle
+```sh
+./fairseabattle
+```
 
 Install:
 
-$ sudo cp ./fairseabattle /usr/local/bin/fairseabattle
+```sh
+sudo cp ./fairseabattle /usr/local/bin/fairseabattle
+```
 
 or same
-$ sudo make install
+
+```sh
+sudo make install
+```
 
 you can specify root dir of installation
 if you want to prepare package or just
 have reasons to do this
-$ sudo make INSTALL_ROOT=/opt install
+
+```sh
+sudo make INSTALL_ROOT=/opt install
+```
 
 Enjoy!
 
