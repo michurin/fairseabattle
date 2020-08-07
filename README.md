@@ -5,7 +5,7 @@ The FairSeaBattle -- sink the computer's fleet.
 You can get FairSeaBattle here:
 
 * http://fairseabattle.googlecode.com/
-* https://github.com/h4tr3d/fairseabattle
+* https://github.com/michurin/fairseabattle
 
 Last official sources:
 

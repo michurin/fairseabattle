@@ -100,9 +100,12 @@ Alerter::about() const {
            "</blockquote>"
 #endif
            "<p>The newest version of FairSeaBattle can be obtained"
-           " at the project home page: "
+           " at the project home page: <br />"
            "<a href=\"http://fairseabattle.googlecode.com/\">"
-           "http://fairseabattle.googlecode.com/</a>.</p>"));
+           "http://fairseabattle.googlecode.com/</a><br />"
+           "<a href=\"https://github.com/michurin/fairseabattle\">"
+           "https://github.com/michurin/fairseabattle</a>"
+           ".</p>"));
 }
 
 void
