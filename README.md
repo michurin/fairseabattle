@@ -1,20 +1,12 @@
-# FairSeaBattle
+# Fair Sea Battle
 
 The FairSeaBattle -- sink the computer's fleet.
 
-You can get FairSeaBattle here:
+You can get FairSeaBattle here: https://github.com/michurin/fairseabattle
 
-* http://fairseabattle.googlecode.com/
-* https://github.com/h4tr3d/fairseabattle
+Russian announce: https://habr.com/ru/post/80155/
 
-Last official sources:
-
-* [sources](http://user.rol.ru/~alvm/fairseabattle-1.0pre2.tar.gz)
-* [Windows Binaries](http://user.rol.ru/~alvm/fairseabattle-1.0pre2.zip)
-
-Russian announce:
-
-* <https://habr.com/ru/post/80155/>
+Ported to Qt5 by [Alexander Drozdov](https://github.com/h4tr3d).
 
 ## Licensing
 
@@ -33,8 +25,8 @@ along with FairSeaBattle.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Building
 
-Before building, you will need to have the Qt4 library installed
-on your system (<http://www.trolltech.com/>).
+Before building, you will need to have the Qt5 library installed
+on your system ([https://www.qt.io/](https://www.qt.io/)).
 
 Build:
 
