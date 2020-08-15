@@ -2,6 +2,8 @@
 
 The FairSeaBattle -- sink the computer's fleet.
 
+<p align="center"><img width="345" height="243" src="./fairseabattle.png" alt="Screenshot: Sea Battle game"></p>
+
 You can get FairSeaBattle here: https://github.com/michurin/fairseabattle
 
 Russian announce: https://habr.com/ru/post/80155/
