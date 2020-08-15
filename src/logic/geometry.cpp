@@ -51,15 +51,15 @@ BSPoint::operator-=(BSPoint const & p) {
     py-=p.py;
 }
 
-bool const
+bool
 BSPoint::operator==(BSPoint const & p) const {
     return (px == p.px && py == p.py);
 }
 
-int const
+int
 BSPoint::x() const { return px; }
 
-int const
+int
 BSPoint::y() const { return py; }
 
 void

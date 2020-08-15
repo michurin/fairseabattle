@@ -29,7 +29,6 @@
 class AllValidFiguresIter {
 private:
     BSMap<BSFlags> *arena_map;
-    int fig_len;
     int dir;
     BSRect::iter_inside iter_inside;
 
@@ -56,7 +55,6 @@ private:
 public:
     AllValidFiguresIter(BSMap<BSFlags> *m, int l):
         arena_map(m),
-        fig_len(l),
         dir(0),
         iter_inside(m->get_rect(), BSRect(1, l))
     {
@@ -100,14 +98,19 @@ BSArena::search_rect(BSPoint const & fr) const {
 //-----
 
 BSArena::BSArena(int sz, int const * const l):
-    arena_map(sz),
+    arena_map(BSRect(sz)),
     arena_legend(l)
 {
 //    std::cout << "BSArena::BSArena() done" << std::endl;
 }
 
-BSFlags &
+const BSFlags &
 BSArena::operator[](BSPoint const & p) const {
+    return *arena_map[p];
+}
+
+BSFlags &BSArena::operator[](const BSPoint &p)
+{
     return *arena_map[p];
 }
 
@@ -149,9 +152,9 @@ BSPoint
 BSArenaPuzzle::find_fire() {
 //    std::cout  << "find fire" << std::endl
 //               << arena_map << std::endl;
-    // заполняем счётчики
+    // п╥п╟п©п╬п╩п╫я▐п╣п╪ я│я┤я▒я┌я┤п╦п╨п╦
     if (already_finded == 0) {
-        // обнуляем счётчики
+        // п╬п╠п╫я┐п╩я▐п╣п╪ я│я┤я▒я┌я┤п╦п╨п╦
         for(BSRect::iter p(counts.get_rect()); p(); ++p) {
             *counts[*p] = 0;
         }
@@ -169,23 +172,23 @@ BSArenaPuzzle::find_fire() {
 //        std::cout << " ========== MEGASEARCH ========= (" << already_finded << ")" << std::endl;
         int mx_cn(0);
         for (BSLegend::uniqiter l(arena_legend); l(); ++l) {
-/* не пропускаем короткие корабли
+/* п╫п╣ п©я─п╬п©я┐я│п╨п╟п╣п╪ п╨п╬я─п╬я┌п╨п╦п╣ п╨п╬я─п╟п╠п╩п╦
             if (*l <= already_finded) {
                 continue;
             }
 */
 //            std::cout << "len=" << *l << std::endl;
             for(AllValidFiguresIter i(&arena_map, *l); i(); ++i) {
-                // проверяем корабль на валидность
-                // - в теле есть стреляные поля
-                // - в окружении нет стреляных полей
+                // п©я─п╬п╡п╣я─я▐п╣п╪ п╨п╬я─п╟п╠п╩я▄ п╫п╟ п╡п╟п╩п╦п╢п╫п╬я│я┌я▄
+                // - п╡ я┌п╣п╩п╣ п╣я│я┌я▄ я│я┌я─п╣п╩я▐п╫я▀п╣ п©п╬п╩я▐
+                // - п╡ п╬п╨я─я┐п╤п╣п╫п╦п╦ п╫п╣я┌ я│я┌я─п╣п╩я▐п╫я▀я┘ п©п╬п╩п╣п╧
                 int cn(0);
                 for(BSRect::iter p(*i); p(); ++p) {
                     if (arena_map[*p]->occupied()) {
                         ++cn;
                     }
                 }
-                if (cn == 0) { // если раненых полей нет -- оно нам не нужно
+                if (cn == 0) { // п╣я│п╩п╦ я─п╟п╫п╣п╫я▀я┘ п©п╬п╩п╣п╧ п╫п╣я┌ -- п╬п╫п╬ п╫п╟п╪ п╫п╣ п╫я┐п╤п╫п╬
                     continue;
                 }
                 int cnn(0);
@@ -194,16 +197,16 @@ BSArenaPuzzle::find_fire() {
                         ++cnn;
                     }
                 }
-                if (cnn != cn) { // если есть раненые в окружении -- оно нам не нужно
+                if (cnn != cn) { // п╣я│п╩п╦ п╣я│я┌я▄ я─п╟п╫п╣п╫я▀п╣ п╡ п╬п╨я─я┐п╤п╣п╫п╦п╦ -- п╬п╫п╬ п╫п╟п╪ п╫п╣ п╫я┐п╤п╫п╬
                     continue;
                 }
-                if (mx_cn < cn) { // если это новый рекорд -- обнуляем счётчики
+                if (mx_cn < cn) { // п╣я│п╩п╦ я█я┌п╬ п╫п╬п╡я▀п╧ я─п╣п╨п╬я─п╢ -- п╬п╠п╫я┐п╩я▐п╣п╪ я│я┤я▒я┌я┤п╦п╨п╦
                     for(BSRect::iter p(counts.get_rect()); p(); ++p) {
                         *counts[*p] = 0;
                     }
                     mx_cn = cn;
                 }
-                if (mx_cn == cn) { // учитываем рекордсменов
+                if (mx_cn == cn) { // я┐я┤п╦я┌я▀п╡п╟п╣п╪ я─п╣п╨п╬я─п╢я│п╪п╣п╫п╬п╡
                     for(BSRect::iter p(*i); p(); ++p) { // copypast?
                         if (! arena_map[*p]->fired()) {
                             ++*counts[*p];
@@ -214,7 +217,7 @@ BSArenaPuzzle::find_fire() {
         }
     }
 //    std::cout << counts << std::endl;
-    // находим максимальное
+    // п╫п╟я┘п╬п╢п╦п╪ п╪п╟п╨я│п╦п╪п╟п╩я▄п╫п╬п╣
     BSPoint mp[arena_map.get_rect().square()];
     int m = -1;
     int c = 0;
@@ -233,12 +236,12 @@ BSArenaPuzzle::find_fire() {
     return mp[rand() % c];
 }
 
-// Эта функция возвращает область, которую надо обновить
-// Кроме того, она ведёт счёт раненым клеткам, что
-// работала функция find_fire
-// Первая возможность используется в человеческом
-// интерфейсе; вторая -- в машинном.
-// Возможно, это надо как-то разделить... или ладно?
+// п╜я┌п╟ я└я┐п╫п╨я├п╦я▐ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п╬п╠п╩п╟я│я┌я▄, п╨п╬я┌п╬я─я┐я▌ п╫п╟п╢п╬ п╬п╠п╫п╬п╡п╦я┌я▄
+// п я─п╬п╪п╣ я┌п╬пЁп╬, п╬п╫п╟ п╡п╣п╢я▒я┌ я│я┤я▒я┌ я─п╟п╫п╣п╫я▀п╪ п╨п╩п╣я┌п╨п╟п╪, я┤я┌п╬
+// я─п╟п╠п╬я┌п╟п╩п╟ я└я┐п╫п╨я├п╦я▐ find_fire
+// п÷п╣я─п╡п╟я▐ п╡п╬п╥п╪п╬п╤п╫п╬я│я┌я▄ п╦я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ п╡ я┤п╣п╩п╬п╡п╣я┤п╣я│п╨п╬п╪
+// п╦п╫я┌п╣я─я└п╣п╧я│п╣; п╡я┌п╬я─п╟я▐ -- п╡ п╪п╟я┬п╦п╫п╫п╬п╪.
+// п▓п╬п╥п╪п╬п╤п╫п╬, я█я┌п╬ п╫п╟п╢п╬ п╨п╟п╨-я┌п╬ я─п╟п╥п╢п╣п╩п╦я┌я▄... п╦п╩п╦ п╩п╟п╢п╫п╬?
 BSRect
 BSArenaPuzzle::apply_result(BSPoint const & fire, BSArena::result const result) {
     arena_map[fire]->fire();
@@ -260,8 +263,8 @@ BSArenaPuzzle::apply_result(BSPoint const & fire, BSArena::result const result) 
             already_finded += 1; // success
             arena_map[fire]->occupy();
             BSRect fired_area = search_rect(fire);
-            // вычитаем только столько, сколько потопили потому,
-            // что потопить могли не тот, который добиваем
+            // п╡я▀я┤п╦я┌п╟п╣п╪ я┌п╬п╩я▄п╨п╬ я│я┌п╬п╩я▄п╨п╬, я│п╨п╬п╩я▄п╨п╬ п©п╬я┌п╬п©п╦п╩п╦ п©п╬я┌п╬п╪я┐,
+            // я┤я┌п╬ п©п╬я┌п╬п©п╦я┌я▄ п╪п╬пЁп╩п╦ п╫п╣ я┌п╬я┌, п╨п╬я┌п╬я─я▀п╧ п╢п╬п╠п╦п╡п╟п╣п╪
             already_finded -= fired_area.length();
             BSRect updated_urea = fired_area.grow(arena_map.get_rect());
             for(BSRect::iter p(updated_urea); p(); ++p) {
@@ -270,7 +273,7 @@ BSArenaPuzzle::apply_result(BSPoint const & fire, BSArena::result const result) 
             arena_legend.remove(fired_area.length());
             return updated_urea;
     }
-    assert(false); // невероятная ситуация!
+    assert(false); // п╫п╣п╡п╣я─п╬я▐я┌п╫п╟я▐ я│п╦я┌я┐п╟я├п╦я▐!
     return BSRect();
 }
 
@@ -286,48 +289,48 @@ BSArenaKey::BSArenaKey(int sz, int const * const l) : BSArena(sz, l) {}
 
 bool
 BSArenaKey::has_not_fired_neighbor(BSRect const & fired_area) const {
-    // смотрим, нет ли на границе раненой области не-раненых фрагментов
+    // я│п╪п╬я┌я─п╦п╪, п╫п╣я┌ п╩п╦ п╫п╟ пЁя─п╟п╫п╦я├п╣ я─п╟п╫п╣п╫п╬п╧ п╬п╠п╩п╟я│я┌п╦ п╫п╣-я─п╟п╫п╣п╫я▀я┘ я└я─п╟пЁп╪п╣п╫я┌п╬п╡
     for(BSRect::iter p(fired_area.grow(arena_map.get_rect())); p(); ++p) {
         if (arena_map[*p]->occupied() && ! arena_map[*p]->fired()) {
-            return true; // ещё есть куда стрелять
+            return true; // п╣я┴я▒ п╣я│я┌я▄ п╨я┐п╢п╟ я│я┌я─п╣п╩я▐я┌я▄
         }
     }
     return false;
 }
 
-// функция проверки может изменять поле,
-// чтобы сигнализировать об ошибках.
-// однако, сейчас она этого не делает,
-// но всё равно не может быть const, так как
-// использует в вычисления легенду.
-// это не очень красиво. надо либо выполнять
-// действия, либо использовать копию легенды.
+// я└я┐п╫п╨я├п╦я▐ п©я─п╬п╡п╣я─п╨п╦ п╪п╬п╤п╣я┌ п╦п╥п╪п╣п╫я▐я┌я▄ п©п╬п╩п╣,
+// я┤я┌п╬п╠я▀ я│п╦пЁп╫п╟п╩п╦п╥п╦я─п╬п╡п╟я┌я▄ п╬п╠ п╬я┬п╦п╠п╨п╟я┘.
+// п╬п╢п╫п╟п╨п╬, я│п╣п╧я┤п╟я│ п╬п╫п╟ я█я┌п╬пЁп╬ п╫п╣ п╢п╣п╩п╟п╣я┌,
+// п╫п╬ п╡я│я▒ я─п╟п╡п╫п╬ п╫п╣ п╪п╬п╤п╣я┌ п╠я▀я┌я▄ const, я┌п╟п╨ п╨п╟п╨
+// п╦я│п©п╬п╩я▄п╥я┐п╣я┌ п╡ п╡я▀я┤п╦я│п╩п╣п╫п╦я▐ п╩п╣пЁп╣п╫п╢я┐.
+// я█я┌п╬ п╫п╣ п╬я┤п╣п╫я▄ п╨я─п╟я│п╦п╡п╬. п╫п╟п╢п╬ п╩п╦п╠п╬ п╡я▀п©п╬п╩п╫я▐я┌я▄
+// п╢п╣п╧я│я┌п╡п╦я▐, п╩п╦п╠п╬ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ п╨п╬п©п╦я▌ п╩п╣пЁп╣п╫п╢я▀.
 bool
 BSArenaKey::check() {
 //    std::cout << "BSArenaKey::check()" << std::endl;
     bool setup_is_ok(true);
-    // бежим по всем точкам
+    // п╠п╣п╤п╦п╪ п©п╬ п╡я│п╣п╪ я┌п╬я┤п╨п╟п╪
     for(BSRect::iter p(arena_map.get_rect()); p(); ++p) {
-        // рассматриваем точки, в которые есть фигуры,
-        // но которые ещё не помечены (пометка используется
-        // для того, чтобы не просматривать одну фигуру дважды)
+        // я─п╟я│я│п╪п╟я┌я─п╦п╡п╟п╣п╪ я┌п╬я┤п╨п╦, п╡ п╨п╬я┌п╬я─я▀п╣ п╣я│я┌я▄ я└п╦пЁя┐я─я▀,
+        // п╫п╬ п╨п╬я┌п╬я─я▀п╣ п╣я┴я▒ п╫п╣ п©п╬п╪п╣я┤п╣п╫я▀ (п©п╬п╪п╣я┌п╨п╟ п╦я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐
+        // п╢п╩я▐ я┌п╬пЁп╬, я┤я┌п╬п╠я▀ п╫п╣ п©я─п╬я│п╪п╟я┌я─п╦п╡п╟я┌я▄ п╬п╢п╫я┐ я└п╦пЁя┐я─я┐ п╢п╡п╟п╤п╢я▀)
         if (arena_map[*p]->occupied() &&
             !arena_map[*p]->fired()) {
-            // ищем фигуру
+            // п╦я┴п╣п╪ я└п╦пЁя┐я─я┐
             BSRect fired_area = search_rect(*p);
 //          std::cout << "fired_area = " << fired_area << std::endl;
-            // помечаем, чтобы не рассматривать второй раз
+            // п©п╬п╪п╣я┤п╟п╣п╪, я┤я┌п╬п╠я▀ п╫п╣ я─п╟я│я│п╪п╟я┌я─п╦п╡п╟я┌я▄ п╡я┌п╬я─п╬п╧ я─п╟п╥
             for(BSRect::iter i(fired_area); i(); ++i) {
                 arena_map[*i]->fire();
             }
 //          std::cout << arena_map << std::endl;
-            // смотрим, есть ли в округе не-помеченные
+            // я│п╪п╬я┌я─п╦п╪, п╣я│я┌я▄ п╩п╦ п╡ п╬п╨я─я┐пЁп╣ п╫п╣-п©п╬п╪п╣я┤п╣п╫п╫я▀п╣
             if (has_not_fired_neighbor(fired_area)) {
 //                std::cout << "ERROR!!" << std::endl;
                 setup_is_ok = false;
                 break;
             }
-            // проверяем соответствие легенде
+            // п©я─п╬п╡п╣я─я▐п╣п╪ я│п╬п╬я┌п╡п╣я┌я│я┌п╡п╦п╣ п╩п╣пЁп╣п╫п╢п╣
             if (!arena_legend.remove(fired_area.length())) {
 //                std::cout << "ERROR!! (2)" << std::endl;
                 setup_is_ok = false;
@@ -335,11 +338,11 @@ BSArenaKey::check() {
             }
         }
     }
-    // проверяем вся ли легенда использована
+    // п©я─п╬п╡п╣я─я▐п╣п╪ п╡я│я▐ п╩п╦ п╩п╣пЁп╣п╫п╢п╟ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╟
     if (setup_is_ok) {
         setup_is_ok = arena_legend.is_empty();
     }
-    // чистим пометки
+    // я┤п╦я│я┌п╦п╪ п©п╬п╪п╣я┌п╨п╦
     arena_legend.raise_all();
     for(BSRect::iter p(arena_map.get_rect()); p(); ++p) {
         arena_map[*p]->unfire();
@@ -376,26 +379,26 @@ BSArenaKey::auto_setup() {
 BSArena::result
 BSArenaKey::apply_fire(BSPoint const & fr) {
     if (arena_map[fr]->fired()) {
-        return BSArena::r_already_fired; // уже
+        return BSArena::r_already_fired; // я┐п╤п╣
     }
     arena_map[fr]->fire();
     if (arena_map[fr]->marked()) {
-        return BSArena::r_wasted_effort; // и так ясно, что пустое
+        return BSArena::r_wasted_effort; // п╦ я┌п╟п╨ я▐я│п╫п╬, я┤я┌п╬ п©я┐я│я┌п╬п╣
     }
-    if (arena_map[fr]->occupied()) { // уже ранено
-        // анализируем добито ли
-        // находим раненую область
+    if (arena_map[fr]->occupied()) { // я┐п╤п╣ я─п╟п╫п╣п╫п╬
+        // п╟п╫п╟п╩п╦п╥п╦я─я┐п╣п╪ п╢п╬п╠п╦я┌п╬ п╩п╦
+        // п╫п╟я┘п╬п╢п╦п╪ я─п╟п╫п╣п╫я┐я▌ п╬п╠п╩п╟я│я┌я▄
         BSRect fired_area = search_rect(fr);
-        // смотрим, нет ли на границе раненой области не-раненых фрагментов
+        // я│п╪п╬я┌я─п╦п╪, п╫п╣я┌ п╩п╦ п╫п╟ пЁя─п╟п╫п╦я├п╣ я─п╟п╫п╣п╫п╬п╧ п╬п╠п╩п╟я│я┌п╦ п╫п╣-я─п╟п╫п╣п╫я▀я┘ я└я─п╟пЁп╪п╣п╫я┌п╬п╡
         if (has_not_fired_neighbor(fired_area)) {
             return BSArena::r_continue_in_that_direction;
         }
         arena_legend.remove(fired_area.length());
 //        std::cout << arena_legend << " (aft.rem)" << std::endl;
         if (arena_legend.is_empty()) {
-            return BSArena::r_game_over; // ну всё вообще
+            return BSArena::r_game_over; // п╫я┐ п╡я│я▒ п╡п╬п╬п╠я┴п╣
         }
-        return BSArena::r_drowned; // всё. потоп
+        return BSArena::r_drowned; // п╡я│я▒. п©п╬я┌п╬п©
     }
-    return BSArena::r_milk; // в молоко
+    return BSArena::r_milk; // п╡ п╪п╬п╩п╬п╨п╬
 }

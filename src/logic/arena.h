@@ -37,19 +37,20 @@ protected:
 
 public:
     enum result {
-        r_milk,            // мимо
-        r_already_fired,   // сюда уже стреляли
-        r_wasted_effort,   // мимо, но вам и так должно быть известно, что здесь ничего нет
-        r_continue_in_that_direction, // ранен, продолжайте добивать
-        r_drowned,         // утонул
-        r_game_over        // добит последний, игра окончена
+        r_milk,            // п╪п╦п╪п╬
+        r_already_fired,   // я│я▌п╢п╟ я┐п╤п╣ я│я┌я─п╣п╩я▐п╩п╦
+        r_wasted_effort,   // п╪п╦п╪п╬, п╫п╬ п╡п╟п╪ п╦ я┌п╟п╨ п╢п╬п╩п╤п╫п╬ п╠я▀я┌я▄ п╦п╥п╡п╣я│я┌п╫п╬, я┤я┌п╬ п╥п╢п╣я│я▄ п╫п╦я┤п╣пЁп╬ п╫п╣я┌
+        r_continue_in_that_direction, // я─п╟п╫п╣п╫, п©я─п╬п╢п╬п╩п╤п╟п╧я┌п╣ п╢п╬п╠п╦п╡п╟я┌я▄
+        r_drowned,         // я┐я┌п╬п╫я┐п╩
+        r_game_over        // п╢п╬п╠п╦я┌ п©п╬я│п╩п╣п╢п╫п╦п╧, п╦пЁя─п╟ п╬п╨п╬п╫я┤п╣п╫п╟
     };
     BSArena(int sz, int const * const l);
-    BSFlags & operator[](BSPoint const & p) const;
+    const BSFlags & operator[](BSPoint const & p) const;
+    BSFlags& operator[](BSPoint const & p);
     BSRect get_rect() const;
     void load_legend(int const * const l);
     void clean();
-    // если понадобится деструктор, то он должен быть виртуальным!
+    // п╣я│п╩п╦ п©п╬п╫п╟п╢п╬п╠п╦я┌я│я▐ п╢п╣я│я┌я─я┐п╨я┌п╬я─, я┌п╬ п╬п╫ п╢п╬п╩п╤п╣п╫ п╠я▀я┌я▄ п╡п╦я─я┌я┐п╟п╩я▄п╫я▀п╪!
 };
 
 class BSArenaPuzzle : public BSArena {

@@ -37,9 +37,9 @@ public:
     BSPoint const operator-(BSPoint const & p) const;
     void operator+=(BSPoint const & p);
     void operator-=(BSPoint const & p);
-    bool const operator==(BSPoint const & p) const;
-    int const x() const;
-    int const y() const;
+    bool operator==(BSPoint const & p) const;
+    int x() const;
+    int y() const;
     void swap();
 };
 
@@ -53,8 +53,8 @@ public:
     class iter_inside;
     BSRect();
     BSRect(BSPoint const & a, BSPoint const & b);
-    BSRect(BSPoint const & a);
-    BSRect(int size);
+    explicit BSRect(BSPoint const & a);
+    explicit BSRect(int size);
     BSRect(int dx, int dy);
     int width() const;
     int height() const;
@@ -67,7 +67,7 @@ public:
 };
 
 /*
- *  Итератор всех точек в данном прямоугольнике
+ *  п≤я┌п╣я─п╟я┌п╬я─ п╡я│п╣я┘ я┌п╬я┤п╣п╨ п╡ п╢п╟п╫п╫п╬п╪ п©я─я▐п╪п╬я┐пЁп╬п╩я▄п╫п╦п╨п╣
  */
 class BSRect::iter {
 private:
@@ -82,7 +82,7 @@ public:
 };
 
 /*
- *  Итератор всех прямоугольников в данном прямоугольнике
+ *  п≤я┌п╣я─п╟я┌п╬я─ п╡я│п╣я┘ п©я─я▐п╪п╬я┐пЁп╬п╩я▄п╫п╦п╨п╬п╡ п╡ п╢п╟п╫п╫п╬п╪ п©я─я▐п╪п╬я┐пЁп╬п╩я▄п╫п╦п╨п╣
  */
 class BSRect::iter_inside {
 private:
@@ -104,3 +104,4 @@ std::ostream & operator << (std::ostream& os, const BSRect & p);
 std::ostream & operator << (std::ostream& os, const BSPoint & p);
 
 #endif
+
